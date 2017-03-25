@@ -9,7 +9,6 @@ class App extends Component {
     render() {
         return (
             <div>
-                {/*<div><p>this is the upper paragraph!</p><MyHist name="dummyname"></MyHist></div>*/}
                 <div><h2>Progressive Histogram</h2><ProgHist name="dummyname"></ProgHist></div>
             </div>
 

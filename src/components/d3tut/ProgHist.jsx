@@ -9,7 +9,7 @@ export class ProgHist extends Component {
     render() {
         return (
             <div>
-                <p>this is vid01 a paragraph!</p>
+
             </div>
         );
     }
@@ -84,6 +84,7 @@ export class ProgHist extends Component {
 
         setInterval(()=>{
             let chooseRand = this.myrand(0,2);
+            let pieIdx = this.myrand(0,20);
 
             canvas.selectAll("*").remove();
 
@@ -98,11 +99,9 @@ export class ProgHist extends Component {
 
                 ages.push(r);
             }
-            console.log(ages.length);
 
             let hist = d3.layout.histogram();
             let bins = hist.bins(30)(ages);
-            console.log(bins);
             var sy = d3.scale.linear()
                 .domain([0, d3.max(bins.map(d=>d.y))])
                 .range([0, height]);
@@ -136,7 +135,7 @@ export class ProgHist extends Component {
                 .attr("x2", d=>sx(d.x+d.dx))
                 .attr("y2", d=>height-sy(d.y))
                 .attr("fill", "none")
-                .attr("stroke", "red")
+                .attr("stroke", "#33aade")
                 .attr("stroke-width", "3");
 
 
@@ -160,21 +159,19 @@ export class ProgHist extends Component {
                     .data(histVerLines)
                     .enter()
                     .append("line")
-                    .attr("class","histverline")
+                    .attr("class", (d,i)=>{return i==((pieIdx+5)%20)?"histverline-dash":"histverline"; })
                     .attr("x1", (d,i)=>sx(d.x1))
                     .attr("y1", (d,i)=>height-sy(d.y1))
                     .attr("x2", (d,i)=>sx(d.x2))
                     .attr("y2", (d,i)=>height-sy(d.y2))
                     .attr("fill", "none")
-                    .attr("stroke", "red")
+                    .attr("stroke", (d,i)=>{return i==((pieIdx+5)%20)?"purple":"#33aade"; })
                     .attr("stroke-width", "3")
                 ;
 
-            let pieIdx = this.myrand(0,20);
             let pie = [sx(bins[pieIdx].x+bins[pieIdx].dx/2), height-sy(bins[pieIdx].y), sx(bins[pieIdx].dx/2), 3];
             let updown = this.myrand(0,1);
-            console.log(updown);
-            this.drawPie(canvas, pie[0], pie[1], pie[2],pie[3],updown==0?"up":"down", "steelblue");
+            this.drawPie(canvas, pie[0], pie[1], pie[2],pie[3],updown==0?"up":"down", "red");
 
 
 
@@ -184,14 +181,61 @@ export class ProgHist extends Component {
 
             let sinus = [sx(bins[sinIdx].x+bins[sinIdx].dx/4), height-sy(bins[sinIdx].y), sx(bins[sinIdx].dx/2), 3];
 
-            this.drawSinus(canvas, sinus[0], sinus[1], sinus[2],sinus[3], "steelblue");
-
+            this.drawSinus(canvas, sinus[0], sinus[1], sinus[2],sinus[3], "red");
+            this.drawBoxplots(bars,sx, sy,height, "red");
         },timeInterval);
 
 
 
     }
 
+
+    drawBoxplots(bars, sx,sy,height, color){
+
+        // bars.append("text")
+        //     .attr("x", d=>sx(d.x))
+        //     .attr("y", d=>height-sy(d.y))
+        //     .attr("dx", d=>sx(d.dx)/2)
+        //     .attr("text-anchor", "middle")
+        //     .attr("dy",20)
+        //     .attr("fill", "#000000")
+        //     .text(d=>d.y);
+
+         bars.append("line")
+            .attr("class","boxplot")
+            .attr("x1", (d,i)=>sx(d.x+d.dx/2))
+            .attr("y1", (d,i)=>height-sy(d.y)-5)
+            .attr("x2", (d,i)=>sx(d.x+d.dx/2))
+            .attr("y2", (d,i)=>height-sy(d.y)+5)
+            .attr("fill", "none")
+            .attr("stroke", color)
+            .attr("stroke-width", "1")
+            ;
+
+        bars.append("line")
+            .attr("class","boxplottop")
+            .attr("x1", (d,i)=>sx(d.x+d.dx/2)-2)
+            .attr("y1", (d,i)=>height-sy(d.y)-5)
+            .attr("x2", (d,i)=>sx(d.x+d.dx/2)+2)
+            .attr("y2", (d,i)=>height-sy(d.y)-5)
+            .attr("fill", "none")
+            .attr("stroke", color)
+            .attr("stroke-width", "1")
+        ;
+
+        bars.append("line")
+            .attr("class","boxplotbottom")
+            .attr("x1", (d,i)=>sx(d.x+d.dx/2)-2)
+            .attr("y1", (d,i)=>height-sy(d.y)+5)
+            .attr("x2", (d,i)=>sx(d.x+d.dx/2)+2)
+            .attr("y2", (d,i)=>height-sy(d.y)+5)
+            .attr("fill", "none")
+            .attr("stroke", color)
+            .attr("stroke-width", "1")
+        ;
+
+
+    }
 
     drawPie(canvas, x,y,r,w, dir, color){
         let p = Math.PI *2;
@@ -208,8 +252,8 @@ export class ProgHist extends Component {
     }
 
     drawSinus(canvas, x,y,r,w, color){
-        this.drawPie(canvas, x,y, r/2,w, "up", "steelblue");
-        this.drawPie(canvas, x+r,y, r/2,w, "dow", "steelblue");
+        this.drawPie(canvas, x,y, r/2,w, "up",color);
+        this.drawPie(canvas, x+r,y, r/2,w, "dow", color);
 
     }
 
