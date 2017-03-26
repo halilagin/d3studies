@@ -9,9 +9,9 @@ export class ProgHist extends Component {
         return (
             <div>
                 <label>Interval <input ref="txtInterval" defaultValue={this.state.interval} />ms </label>
-                <label> <button key="start" index="start"  onClick={this.setInterval.bind(this)} >Set</button></label>
+                <label> <button key="start" index="start"  onClick={this.startTimer.bind(this)} >Start</button></label>
 
-                <label>Action <button key="start" index="start"  >Start</button></label>
+                <label>Action <button key="start" index="start"  onClick={this.stopTimer.bind(this)} >Stop</button></label>
             </div>
         );
     }
@@ -20,6 +20,19 @@ export class ProgHist extends Component {
         let newInterval = this.refs.txtInterval.value;
         this.state.interval =newInterval;
 
+    }
+
+    startTimer(){
+        this.setInterval();
+        if (this.state.timer!=null)
+            clearInterval(this.state.timer);
+
+        this.start();
+    }
+
+    stopTimer(){
+        if (this.state.timer!=null)
+            clearInterval(this.state.timer);
     }
 
 
@@ -87,16 +100,16 @@ export class ProgHist extends Component {
             timeInterval = this.state.interval;
 
 
+        if (this.state.canvas==null)
+            this.state.canvas = d3.select("body").append("svg")
+                .attr("width", this.state.width)
+                .attr("height",this.state.height+this.state.padding)
+                .append("g")
+                .attr("transform", "translate(20,20)")
+                ;
 
-        this.state.canvas = d3.select("body").append("svg")
-            .attr("width", this.state.width)
-            .attr("height",this.state.height+this.state.padding)
-            .append("g")
-            .attr("transform", "translate(20,20)")
-            ;
 
-
-        setInterval(()=>{this.loopDrawingProgHist();}
+        this.state.timer = setInterval(()=>{this.loopDrawingProgHist();}
             ,timeInterval);
 
     }
@@ -289,7 +302,8 @@ export class ProgHist extends Component {
             width:800,
             height:500,
             padding:50,
-            canvas:null
+            canvas:null,
+            timer:null
 
 
         };
