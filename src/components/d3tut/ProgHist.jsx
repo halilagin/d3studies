@@ -5,21 +5,25 @@ import * as d3 from 'd3';
 export class ProgHist extends Component {
 
 
-
     render() {
         return (
             <div>
+                <label>Interval <input ref="txtInterval" defaultValue={this.state.interval} />ms </label>
+                <label> <button key="start" index="start"  onClick={this.setInterval.bind(this)} >Set</button></label>
 
+                <label>Action <button key="start" index="start"  >Start</button></label>
             </div>
         );
     }
 
+    setInterval(){
+        let newInterval = this.refs.txtInterval.value;
+        this.state.interval =newInterval;
+
+    }
+
 
     componentWillReceiveProps(props) {
-        let ages = [1, 5, 10, 12, 35, 75, 68, 2, 7, 10, 55, 40, 42, 86, 39, 16, 47, 61, 9, 14, 1, 5, 10, 10, 12, 35, 75, 64, 22, 28, 2, 7, 21, 59, 43, 42, 83, 39, 18, 47, 59, 8, 15];
-        this.setState({name: props.name});
-        this.setState({"ages":ages});
-        alert(this.getState("ages"));
 
     }
 
@@ -64,128 +68,148 @@ export class ProgHist extends Component {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    progHist(ages  ){
-        let timeInterval=3000;
 
-        var width=800, height=500, padding=50;
-        var sx = d3.scale.linear()
-            .domain([0, d3.max(ages)])
-            .range([0,width]);
-        let canvas = d3.select("body").append("svg")
-            .attr("width", width)
-            .attr("height",height+padding)
+    randFn25(){
+        return d3.random.normal(25,5);
+    }
+
+    randFn50(){
+        return d3.random.normal(50,5);
+    }
+
+    randFn75(){
+        return d3.random.normal(75,5);
+    }
+
+    start(){
+        let timeInterval=3000;
+        if (this.state!=null && this.state.interval!=null)
+            timeInterval = this.state.interval;
+
+
+
+        this.state.canvas = d3.select("body").append("svg")
+            .attr("width", this.state.width)
+            .attr("height",this.state.height+this.state.padding)
             .append("g")
             .attr("transform", "translate(20,20)")
             ;
-        let randFn25 = d3.random.normal(25,5);
-        let randFn50 = d3.random.normal(50,5);
-        let randFn75 = d3.random.normal(75,5);
 
 
-        setInterval(()=>{
-            let chooseRand = this.myrand(0,2);
-            let pieIdx = this.myrand(0,20);
+        setInterval(()=>{this.loopDrawingProgHist();}
+            ,timeInterval);
 
-            canvas.selectAll("*").remove();
+    }
 
-            for (var i=0;i<10;i++){
-                let r=0;
-                if (chooseRand==0)
-                    r = Math.round(randFn25());
-                else if (chooseRand==1)
-                    r = Math.round(randFn50());
-                else if (chooseRand==2)
-                    r = Math.round(randFn75());
+    loopDrawingProgHist(){
+        //alert(this.state.canvas);
+        let chooseRand = this.myrand(0,2);
+        let pieIdx = this.myrand(0,20);
 
-                ages.push(r);
-            }
+        this.state.canvas.selectAll("*").remove();
 
-            let hist = d3.layout.histogram();
-            let bins = hist.bins(30)(ages);
-            var sy = d3.scale.linear()
-                .domain([0, d3.max(bins.map(d=>d.y))])
-                .range([0, height]);
-            //this.getBins(5,this.ages);
+        let newAges = this.state.ages;
+        for (var i=0;i<10;i++){
+            let r=0;
+            if (chooseRand==0)
+                r = Math.round(this.randFn25()());
+            else if (chooseRand==1)
+                r = Math.round(this.randFn50()());
+            else
+                r = Math.round(this.randFn75()());
 
-            let histVerLines =[{
-                "x1":1,
-                "y1":0,
-                "x2":bins[0].x,
-                "y2":bins[0].y
-            }];
-            for (var i=0;i<bins.length-1;i++) {
-                histVerLines.push({
-                    "x1":bins[i].x+bins[i].dx,
-                    "y1":bins[i].y,
-                    "x2":bins[i+1].x,
-                    "y2":bins[i+1].y
-                });
-            }
+            newAges.push(r);
+        }
+        this.setState({ages: newAges});
 
-            var bars = canvas.selectAll(".histhorline")
-                    .data(bins)
-                    .enter()
-                    .append("g")
-                ;
-            let scale = 5;
-            bars.append("line")
-                .classed("histhorline",true)
-                .attr("x1", d=>sx(d.x) )
-                .attr("y1", d=>height-sy(d.y))
-                .attr("x2", d=>sx(d.x+d.dx))
-                .attr("y2", d=>height-sy(d.y))
+
+        var sx = d3.scale.linear()
+            .domain([0, d3.max(this.state.ages)])
+            .range([0,this.state.width]);
+
+        let hist = d3.layout.histogram();
+        let bins = hist.bins(30)(this.state.ages);
+        var sy = d3.scale.linear()
+            .domain([0, d3.max(bins.map(d=>d.y))])
+            .range([0, this.state.height]);
+        //this.getBins(5,this.this.ages);
+
+        let histVerLines =[{
+            "x1":1,
+            "y1":0,
+            "x2":bins[0].x,
+            "y2":bins[0].y
+        }];
+        for (var i=0;i<bins.length-1;i++) {
+            histVerLines.push({
+                "x1":bins[i].x+bins[i].dx,
+                "y1":bins[i].y,
+                "x2":bins[i+1].x,
+                "y2":bins[i+1].y
+            });
+        }
+
+        var bars = this.state.canvas.selectAll(".histhorline")
+                .data(bins)
+                .enter()
+                .append("g")
+            ;
+        let scale = 5;
+        bars.append("line")
+            .classed("histhorline",true)
+            .attr("x1", d=>sx(d.x) )
+            .attr("y1", d=>this.state.height-sy(d.y))
+            .attr("x2", d=>sx(d.x+d.dx))
+            .attr("y2", d=>this.state.height-sy(d.y))
+            .attr("fill", "none")
+            .attr("stroke", "#33aade")
+            .attr("stroke-width", "3");
+
+
+
+        let gXaxis = d3.svg.axis().scale(sx).orient("bottom");
+        this.state.canvas.append("g")
+            .call(gXaxis)
+            .attr("transform", "translate(5,"+(this.state.height+5)+")");
+
+        bars.append("text")
+            .attr("x", d=>sx(d.x))
+            .attr("y", d=>this.state.height-sy(d.y))
+            .attr("dx", d=>sx(d.dx)/2)
+            .attr("text-anchor", "middle")
+            .attr("dy",20)
+            .attr("fill", "#000000")
+            .text(d=>d.y);
+
+
+        var histverlineG = this.state.canvas.selectAll(".histverline")
+                .data(histVerLines)
+                .enter()
+                .append("line")
+                .attr("class", (d,i)=>{return i==((pieIdx+5)%20)?"histverline-dash":"histverline"; })
+                .attr("x1", (d,i)=>sx(d.x1))
+                .attr("y1", (d,i)=>this.state.height-sy(d.y1))
+                .attr("x2", (d,i)=>sx(d.x2))
+                .attr("y2", (d,i)=>this.state.height-sy(d.y2))
                 .attr("fill", "none")
-                .attr("stroke", "#33aade")
-                .attr("stroke-width", "3");
+                .attr("stroke", (d,i)=>{return i==((pieIdx+5)%20)?"purple":"#33aade"; })
+                .attr("stroke-width", "3")
+            ;
+
+        let pie = [sx(bins[pieIdx].x+bins[pieIdx].dx/2), this.state.height-sy(bins[pieIdx].y), sx(bins[pieIdx].dx/2), 3];
+        let updown = this.myrand(0,1);
+        this.drawPie(this.state.canvas, pie[0], pie[1], pie[2],pie[3],updown==0?"up":"down", "red");
 
 
 
-            let gXaxis = d3.svg.axis().scale(sx).orient("bottom");
-            canvas.append("g")
-                .call(gXaxis)
-                .attr("transform", "translate(5,"+(height+5)+")");
+        let sinIdx = Math.abs(20-pieIdx);
+        if (sinIdx==pieIdx)
+            sinIdx = ((sinIdx+1)%20);
 
-            bars.append("text")
-                .attr("x", d=>sx(d.x))
-                .attr("y", d=>height-sy(d.y))
-                .attr("dx", d=>sx(d.dx)/2)
-                .attr("text-anchor", "middle")
-                .attr("dy",20)
-                .attr("fill", "#000000")
-                .text(d=>d.y);
+        let sinus = [sx(bins[sinIdx].x+bins[sinIdx].dx/4), this.state.height-sy(bins[sinIdx].y), sx(bins[sinIdx].dx/2), 3];
 
-
-            var histverlineG = canvas.selectAll(".histverline")
-                    .data(histVerLines)
-                    .enter()
-                    .append("line")
-                    .attr("class", (d,i)=>{return i==((pieIdx+5)%20)?"histverline-dash":"histverline"; })
-                    .attr("x1", (d,i)=>sx(d.x1))
-                    .attr("y1", (d,i)=>height-sy(d.y1))
-                    .attr("x2", (d,i)=>sx(d.x2))
-                    .attr("y2", (d,i)=>height-sy(d.y2))
-                    .attr("fill", "none")
-                    .attr("stroke", (d,i)=>{return i==((pieIdx+5)%20)?"purple":"#33aade"; })
-                    .attr("stroke-width", "3")
-                ;
-
-            let pie = [sx(bins[pieIdx].x+bins[pieIdx].dx/2), height-sy(bins[pieIdx].y), sx(bins[pieIdx].dx/2), 3];
-            let updown = this.myrand(0,1);
-            this.drawPie(canvas, pie[0], pie[1], pie[2],pie[3],updown==0?"up":"down", "red");
-
-
-
-            let sinIdx = Math.abs(20-pieIdx);
-            if (sinIdx==pieIdx)
-                sinIdx = ((sinIdx+1)%20);
-
-            let sinus = [sx(bins[sinIdx].x+bins[sinIdx].dx/4), height-sy(bins[sinIdx].y), sx(bins[sinIdx].dx/2), 3];
-
-            this.drawSinus(canvas, sinus[0], sinus[1], sinus[2],sinus[3], "red");
-            this.drawBoxplots(bars,sx, sy,height, "red");
-        },timeInterval);
-
-
+        this.drawSinus(this.state.canvas, sinus[0], sinus[1], sinus[2],sinus[3], "red");
+        this.drawBoxplots(bars,sx, sy,this.state.height, "red");
 
     }
 
@@ -259,19 +283,18 @@ export class ProgHist extends Component {
 
 
     componentWillMount() {
-        let ages = [1, 5, 10, 12, 35, 75, 68, 2, 7, 10, 55, 40, 42, 86, 39, 16, 47, 61, 9, 14, 1, 5, 10, 10, 12, 35, 75, 64, 22, 28, 2, 7, 21, 59, 43, 42, 83, 39, 18, 47, 59, 8, 15];
-        //this.setState({"ages":ages});
+        this.state = {
+            interval: 2000,
+            ages:[],
+            width:800,
+            height:500,
+            padding:50,
+            canvas:null
 
-        //alert(this.state.ages);
-        //this.setState({name: "noname"});
-        this.progHist(ages);
 
-        //setInterval(()=>{this.progHist(ages);}, 2000);
-        // d3.csv("/public/data/ages.csv", (data)=>{
-        //
-        // });
-
-        ;
+        };
+        this.state.ages = [1, 5, 10, 12, 35, 75, 68, 2, 7, 10, 55, 40, 42, 86, 39, 16, 47, 61, 9, 14, 1, 5, 10, 10, 12, 35, 75, 64, 22, 28, 2, 7, 21, 59, 43, 42, 83, 39, 18, 47, 59, 8, 15];
+        this.start();
     }
 }
 
