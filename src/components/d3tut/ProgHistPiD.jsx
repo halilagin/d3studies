@@ -2,15 +2,11 @@ import React, {Component} from 'react';
 import * as d3 from 'd3';
 
 
-export class ProgHist extends Component {
+export class ProgHistPiD extends Component {
 
     render() {
-
-
         return (
             <div>
-
-
                 <label>Bins Count <input ref="txtBinsCount" defaultValue={this.state.binsCount} /></label>
 
                 <label>Interval <input ref="txtInterval" defaultValue={this.state.interval} />ms </label>
@@ -123,7 +119,6 @@ export class ProgHist extends Component {
             timeInterval = this.state.interval;
 
 
-
         if (this.state.canvas==null)
             this.state.canvas = d3.select("."+this.state.mountClass).append("svg")
                 .attr("width", this.state.width)
@@ -131,7 +126,6 @@ export class ProgHist extends Component {
                 .append("g")
                 .attr("transform", "translate(20,20)")
                 ;
-
 
 
         this.state.timer = setInterval(()=>{this.loopDrawingProgHist();}
@@ -150,7 +144,7 @@ export class ProgHist extends Component {
             .attr("y", d=>this.state.height+this.state.padding*0.5)
             .attr("text-anchor", "middle")
             .attr("fill", "#000000")
-            .text("prog-hist-classic");
+            .text("prog-hist-pid");
 
         let newAges = this.state.ages;
         for (var i=0;i<10;i++){
@@ -237,7 +231,6 @@ export class ProgHist extends Component {
                 .attr("stroke", (d,i)=>{return i==((pieIdx+5)%this.state.binsCount)?"purple":"#33aade"; })
                 .attr("stroke-width", "3")
             ;
-
 
         let pie = [sx(bins[pieIdx].x+bins[pieIdx].dx/2), this.state.height-sy(bins[pieIdx].y), sx(bins[pieIdx].dx/2), 3];
         let up_down = this.myrand(0,1);
@@ -329,15 +322,14 @@ export class ProgHist extends Component {
             padding:80,
             canvas:null,
             timer:null,
-            mountClass:"ProgHistClassic"
+            mountClass:"ProgHistPiD"
+
         };
         this.state.ages = [1, 5, 10, 12, 35, 75, 68, 2, 7, 10, 55, 40, 42, 86, 39, 16, 47, 61, 9, 14, 1, 5, 10, 10, 12, 35, 75, 64, 22, 28, 2, 7, 21, 59, 43, 42, 83, 39, 18, 47, 59, 8, 15];
     }
     componentWillMount() {
         this.initData();
         this.start();
-
-
     }
 }
 
