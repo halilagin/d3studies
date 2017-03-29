@@ -168,6 +168,7 @@ export class ProgHist extends Component {
 
         let hist = d3.layout.histogram();
         let bins = hist.bins(this.state.binsCount)(this.state.ages);
+
         var sx = d3.scale.linear()
             .domain([0, d3.max(this.state.ages)])
             .range([0,this.state.width]);

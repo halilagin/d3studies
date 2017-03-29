@@ -12,7 +12,7 @@ class App extends Component {
     render() {
         return (
             <div >
-                <div style={{position:'relative', float:"left",  width:"400px"}}><h2>Progressive Histogram</h2><ProgHist style={{position:'relative'}} name="dummyname" mountClass="ProgHistClassic"></ProgHist></div>
+                {/*<div style={{position:'relative', float:"left",  width:"400px"}}><h2>Progressive Histogram</h2><ProgHist style={{position:'relative'}} name="dummyname" mountClass="ProgHistClassic"></ProgHist></div>*/}
 
                 <div style={{position:'relative',float:"right",width:"400px"}}><h2>Progressive Histogram PiD</h2><ProgHistPiD style={{position:'relative'}} name="dummyname" mountClass="ProgHistPiD"></ProgHistPiD></div>
                 {/*<ProgHistControlPanel></ProgHistControlPanel>*/}
