@@ -137,7 +137,21 @@ export class ProgHistPiD extends Component {
 
     }
 
+    streamData() {
+
+        const url = "http://localhost:5000/test/ch8_10"
+        fetch(url)
+            .then(response => {
+                //alert(response.data);
+                response.json().then(value=> console.log(value.mu));
+            })
+            .catch(error => {
+                console.log("error", error);
+            });
+
+    }
     loopDrawingProgHist(){
+        this.streamData();
         //alert(this.state.canvas);
         let chooseRand = this.myrand(0,2);
 
